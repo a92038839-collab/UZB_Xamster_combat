@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <title>UZB_Xamster_combat</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #303030, #080808 70%);
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .app {
+      max-width: 520px;
+      margin: auto;
+      padding: 18px 15px 100px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      color: #999;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .profile {
+      margin-top: 20px;
+      background: #171717;
+      border: 1px solid #292929;
+      border-radius: 18px;
+      padding: 15px;
+      text-align: left;
+    }
+
+    .username {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      background: #222;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .stat-title {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .coin-box {
+      margin-top: 25px;
+    }
+
+    .coins {
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    .hamster {
+      width: 230px;
+      height: 230px;
+      margin: 20px auto;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 120px;
+
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #fff1bd,
+          #d58a3b 55%,
+          #6d3518
+        );
+
+      border: 6px solid #9d5526;
+
+      box-shadow:
+        0 0 30px rgba(255, 170, 70, .5);
+
+      cursor: pointer;
+
+      user-select: none;
+
+      transition: .08s;
+    }
+
+    .hamster:active {
+      transform: scale(.9);
+    }
+
+    .energy {
+      margin: 10px 0;
+    }
+
+    .energy-bar {
+      height: 12px;
+      background: #242424;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .energy-fill {
+      height: 100%;
+      width: 100%;
+      background: #49d96b;
+      transition: .2s;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 15px;
+      padding: 16px 10px;
+
+      background: #191919;
+      color: white;
+
+      font-size: 15px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(.96);
+    }
+
+    .combat-button {
+      grid-column: 1 / -1;
+
+      background:
+        linear-gradient(
+          135deg,
+          #b82d2d,
+          #651212
+        );
+
+      font-size: 18px;
+    }
+
+    .plus {
+      position: fixed;
+      color: #ffd43b;
+      font-size: 25px;
+      font-weight: bold;
+
+      pointer-events: none;
+
+      animation: fly .7s forwards;
+    }
+
+    @keyframes fly {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-80px);
+      }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+
+      background: rgba(0,0,0,.75);
+
+      display: none;
+      align-items: flex-end;
+
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 520px;
+
+      max-height: 85vh;
+      overflow-y: auto;
+
+      background: #151515;
+
+      border-radius:
+        25px 25px 0 0;
+
+      padding: 20px;
+    }
+
+    .close {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-size: 23px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+
+    .rating {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      background: #222;
+      border-radius: 12px;
+
+      padding: 13px;
+      margin-bottom: 8px;
+    }
+
+    .win {
+      color: #49e26b;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .lose {
+      color: #ff5555;
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="logo">
+    🐹 UZB_Xamster_combat
+  </div>
+
+  <div class="subtitle">
+    ⚔️ FIGHT • 🪙 COIN • 🏆 RANK
+  </div>
+
+  <div class="profile">
+
+    <div
+      class="username"
+      id="username"
+    >
+      👤 Player
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-title">
+          🏆 G‘alaba
+        </div>
+
+        <div
+          class="stat-value"
+          id="wins"
+        >
+          0
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">
+          💀 Mag‘lubiyat
+        </div>
+
+        <div
+          class="stat-value"
+          id="losses"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="coin-box">
+
+    <div class="coins">
+      🪙 <span id="coins">0</span>
+    </div>
+
+  </div>
+
+  <div
+    class="hamster"
+    onclick="tap(event)"
+  >
+    🐹
+  </div>
+
+  <div class="energy">
+
+    ⚡ Energy:
+    <span id="energy">
+      100
+    </span>
+    / 100
+
+    <div class="energy-bar">
+
+      <div
+        class="energy-fill"
+        id="energyFill"
+      ></div>
+
+    </div>
+
+  </div>
+
+  <div class="buttons">
+
+    <button
+      class="combat-button"
+      onclick="combat()"
+    >
+      ⚔️ COMBAT
+    </button>
+
+    <button
+      onclick="openRating()"
+    >
+      🏆 Reyting
+    </button>
+
+    <button
+      onclick="openProfile()"
+    >
+      👤 Profil
+    </button>
+
+    <button
+      onclick="openBonus()"
+    >
+      🎁 Bonus
+    </button>
+
+    <button
+      onclick="openShop()"
+    >
+      ⭐ Shop
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+  class="modal"
+  id="modal"
+  onclick="outsideClose(event)"
+>
+
+  <div class="modal-box">
+
+    <div
+      class="close"
+      onclick="closeModal()"
+    >
+      ✕
+    </div>
+
+    <div
+      class="modal-title"
+      id="modalTitle"
+    >
+      CS
+    </div>
+
+    <div id="modalContent"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const tg =
+  window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+let coins = 0;
+let energy = 100;
+let wins = 0;
+let losses = 0;
+
+
+/* =========================
+   API
+========================= */
+
+async function api(
+  url,
+  body = {}
+) {
+
+  const response =
+    await fetch(
+      url,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          initData:
+            tg.initData,
+
+          ...body
+        })
+      }
+    );
+
+  return response.json();
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/login"
+      );
+
+    if (!data.success) {
+
+      alert(
+        "Telegram user aniqlanmadi"
+      );
+
+      return;
+    }
+
+    const user =
+      data.user;
+
+    coins =
+      Number(user.coins);
+
+    energy =
+      user.energy;
+
+    wins =
+      user.wins;
+
+    losses =
+      user.losses;
+
+    document
+      .getElementById(
+        "username"
+      )
+      .textContent =
+      "👤 " +
+      (
+        user.first_name ||
+        "Player"
+      );
+
+    update();
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE
+========================= */
+
+function update() {
+
+  document
+    .getElementById(
+      "coins"
+    )
+    .textContent =
+    coins.toLocaleString();
+
+  document
+    .getElementById(
+      "energy"
+    )
+    .textContent =
+    energy;
+
+  document
+    .getElementById(
+      "wins"
+    )
+    .textContent =
+    wins;
+
+  document
+    .getElementById(
+      "losses"
+    )
+    .textContent =
+    losses;
+
+  document
+    .getElementById(
+      "energyFill"
+    )
+    .style.width =
+    energy + "%";
+
+}
+
+
+/* =========================
+   TAP
+========================= */
+
+let tapping = false;
+
+async function tap(event) {
+
+  if (tapping) return;
+
+  tapping = true;
+
+  try {
+
+    const data =
+      await api(
+        "/api/tap"
+      );
+
+    if (!data.success) {
+
+      alert(
+        data.message ||
+        "Xatolik"
+      );
+
+      return;
+    }
+
+    coins =
+      Number(data.coins);
+
+    energy =
+      data.energy;
+
+    update();
+
+    const plus =
+      document.createElement(
+        "div"
+      );
+
+    plus.className =
+      "plus";
+
+    plus.textContent =
+      "+1 🪙";
+
+    plus.style.left =
+      event.clientX + "px";
+
+    plus.style.top =
+      event.clientY + "px";
+
+    document.body.appendChild(
+      plus
+    );
+
+    setTimeout(
+      () => plus.remove(),
+      700
+    );
+
+    tg.HapticFeedback
+      ?.impactOccurred(
+        "light"
+      );
+
+  } finally {
+
+    setTimeout(
+      () => {
+        tapping = false;
+      },
+      100
+    );
+
+  }
+
+}
+
+
+/* =========================
+   COMBAT
+========================= */
+
+async function combat() {
+
+  if (energy < 10) {
+
+    alert(
+      "⚡ Energy yetarli emas!"
+    );
+
+    return;
+  }
+
+  const button =
+    document.querySelector(
+      ".combat-button"
+    );
+
+  button.disabled = true;
+
+  button.textContent =
+    "⚔️ Jang...";
+
+  try {
+
+    const data =
+      await api(
+        "/api/combat"
+      );
+
+    if (!data.success) {
+
+      alert(
+        data.message ||
+        "Combat xatosi"
+      );
+
+      return;
+    }
+
+    coins =
+      Number(data.coins);
+
+    energy =
+      data.energy;
+
+    wins =
+      data.wins;
+
+    losses =
+      data.losses;
+
+    update();
+
+    if (data.win) {
+
+      openModal(
+
+        "🏆 G‘ALABA!",
+
+        `
+
+        <div class="win">
+          ⚔️ Siz g‘alaba qozondingiz!
+        </div>
+
+        <br>
+
+        🪙 Mukofot:
+        <b>+${data.reward} Coin</b>
+
+        <br><br>
+
+        💥 Sizning zarbangiz:
+        ${data.playerAttack}
+
+        <br>
+
+        💀 Dushman zarbasi:
+        ${data.enemyAttack}
+
+        `
+
+      );
+
+    } else {
+
+      openModal(
+
+        "💀 MAG‘LUBIYAT",
+
+        `
+
+        <div class="lose">
+          Siz bu jangda yutqazdingiz.
+        </div>
+
+        <br>
+
+        💥 Sizning zarbangiz:
+        ${data.playerAttack}
+
+        <br>
+
+        💀 Dushman zarbasi:
+        ${data.enemyAttack}
+
+        `
+
+      );
+
+    }
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      "⚔️ COMBAT";
+
+  }
+
+}
+
+
+/* =========================
+   RATING
+========================= */
+
+async function openRating() {
+
+  openModal(
+    "🏆 Reyting",
+    "⏳ Yuklanmoqda..."
+  );
+
+  const data =
+    await api(
+      "/api/rating"
+    );
+
+  if (!data.success) {
+
+    document
+      .getElementById(
+        "modalContent"
+      )
+      .textContent =
+      "Xatolik";
+
+    return;
+  }
+
+  let html = "";
+
+  data.rating.forEach(
+    (player, index) => {
+
+      const name =
+        player.username
+        ? "@" +
+          player.username
+        : player.first_name ||
+          "Player";
+
+      html += `
+
+        <div class="rating">
+
+          <b>
+            ${index + 1}
+          </b>
+
+          <span>
+            ${escapeHtml(name)}
+          </span>
+
+          <span>
+            🪙 ${
+              Number(
+                player.coins
+              ).toLocaleString()
+            }
+          </span>
+
+        </div>
+
+      `;
+
+    }
+  );
+
+  document
+    .getElementById(
+      "modalContent"
+    )
+    .innerHTML =
+    html ||
+    "Reyting bo‘sh.";
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+function openProfile() {
+
+  openModal(
+
+    "👤 Profil",
+
+    `
+
+      <div class="rating">
+        🪙 Coin
+        <b>
+          ${coins.toLocaleString()}
+        </b>
+      </div>
+
+      <div class="rating">
+        🏆 G‘alabalar
+        <b>
+          ${wins}
+        </b>
+      </div>
+
+      <div class="rating">
+        💀 Mag‘lubiyatlar
+        <b>
+          ${losses}
+        </b>
+      </div>
+
+      <div class="rating">
+        ⚡ Energy
+        <b>
+          ${energy}/100
+        </b>
+      </div>
+
+    `
+
+  );
+
+}
+
+
+/* =========================
+   BONUS
+========================= */
+
+function openBonus() {
+
+  openModal(
+
+    "🎁 Bonus",
+
+    `
+
+      <div class="rating">
+        🐹 Har kuni o‘yinga kirib bonus oling.
+      </div>
+
+      <div class="rating">
+        ⚔️ Combat qiling va Coin yuting.
+      </div>
+
+      <div class="rating">
+        🏆 Reytingda yuqoriga chiqing.
+      </div>
+
+    `
+
+  );
+
+}
+
+
+/* =========================
+   SHOP
+========================= */
+
+function openShop() {
+
+  openModal(
+
+    "⭐ Shop",
+
+    `
+
+      <div class="rating">
+        ⭐ Stars → 🪙 Coin
+      </div>
+
+      <div class="rating">
+        1 ⭐ = 100 🪙
+      </div>
+
+      <br>
+
+      <button
+        style="width:100%"
+        onclick="buy(1)"
+      >
+        ⭐ 1 Star → 100 Coin
+      </button>
+
+      <br><br>
+
+      <button
+        style="width:100%"
+        onclick="buy(10)"
+      >
+        ⭐ 10 Stars → 1,000 Coin
+      </button>
+
+    `
+
+  );
+
+}
+
+
+async function buy(stars) {
+
+  alert(
+    "⭐ Stars to‘lovi keyingi bosqichda ulanadi."
+  );
+
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function openModal(
+  title,
+  content
+) {
+
+  document
+    .getElementById(
+      "modalTitle"
+    )
+    .textContent =
+    title;
+
+  document
+    .getElementById(
+      "modalContent"
+    )
+    .innerHTML =
+    content;
+
+  document
+    .getElementById(
+      "modal"
+    )
+    .classList
+    .add("show");
+
+}
+
+
+function closeModal() {
+
+  document
+    .getElementById(
+      "modal"
+    )
+    .classList
+    .remove("show");
+
+}
+
+
+function outsideClose(event) {
+
+  if (
+    event.target.id ===
+    "modal"
+  ) {
+
+    closeModal();
+
+  }
+
+}
+
+
+/* =========================
+   ESCAPE
+========================= */
+
+function escapeHtml(value) {
+
+  return String(value)
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
+}
+
+
+/* START */
+
+login();
+
+</script>
+
+</body>
+</html>
